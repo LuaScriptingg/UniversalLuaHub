@@ -25,31 +25,27 @@ panel.BorderSizePixel = 0
 panel.Position = UDim2.new(0.5, -150, 0.3, 0)
 panel.Size = UDim2.new(0, 300, 0, 300)
 
+-- Cria uma função para criar um botão
+local function createButton(name, text, position)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Parent = panel
+    button.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+    button.BorderSizePixel = 0
+    button.Position = position
+    button.Size = UDim2.new(0.8, 0, 0.2, 0)
+    button.Font = Enum.Font.SourceSansBold
+    button.Text = text
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.TextSize = 18
+    return button
+end
+
 -- Cria um botão para o Fly
-local flyButton = Instance.new("TextButton")
-flyButton.Name = "Fly"
-flyButton.Parent = panel
-flyButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-flyButton.BorderSizePixel = 0
-flyButton.Position = UDim2.new(0.1, 0, 0.1, 0)
-flyButton.Size = UDim2.new(0.8, 0, 0.2, 0)
-flyButton.Font = Enum.Font.SourceSansBold
-flyButton.Text = "Fly"
-flyButton.TextColor3 = Color3.new(1, 1, 1)
-flyButton.TextSize = 18
+local flyButton = createButton("Fly", "Fly", UDim2.new(0.1, 0, 0.1, 0))
 
 -- Cria um botão para o ESP
-local espButton = Instance.new("TextButton")
-espButton.Name = "ESP"
-espButton.Parent = panel
-espButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-espButton.BorderSizePixel = 0
-espButton.Position = UDim2.new(0.1, 0, 0.4, 0)
-espButton.Size = UDim2.new(0.8, 0, 0.2, 0)
-espButton.Font = Enum.Font.SourceSansBold
-espButton.Text = "ESP"
-espButton.TextColor3 = Color3.new(1, 1, 1)
-espButton.TextSize = 18
+local espButton = createButton("ESP", "ESP", UDim2.new(0.1, 0, 0.4, 0))
 
 -- Cria uma variável para armazenar o estado do Fly
 local flyEnabled = false
@@ -58,12 +54,12 @@ local flyEnabled = false
 local function toggleFly()
     flyEnabled = not flyEnabled -- Inverte o valor da variável
     if flyEnabled then -- Se o Fly estiver ativado
-        flyButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Muda a cor do botão para verde
-        game:GetService("UserInputService").JumpRequest:Connect(function() -- Conecta um evento para detectar quando o usuário pula
+        flyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Muda a cor do botão para verde
+        UserInputService.JumpRequest:Connect(function() -- Conecta um evento para detectar quando o usuário pula
             game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping) -- Muda o estado do personagem para pulando
         end)
     else -- Se o Fly estiver desativado
-        flyButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Muda a cor do botão para cinza
+        flyButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128) -- Muda a cor do botão para cinza
     end
 end
 
@@ -74,7 +70,7 @@ local espEnabled = false
 local function toggleESP()
     espEnabled = not espEnabled -- Inverte o valor da variável
     if espEnabled then -- Se o ESP estiver ativado
-        espButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Muda a cor do botão para verde
+        espButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Muda a cor do botão para verde
         for _, player in pairs(game.Players:GetPlayers()) do -- Percorre todos os jogadores do jogo
             if player ~= game.Players.LocalPlayer then -- Se o jogador não for o usuário
                 local espBox = Instance.new("BillboardGui") -- Cria uma caixa de ESP
@@ -90,30 +86,12 @@ local function toggleESP()
                 espLabel.BorderSizePixel = 0
                 espLabel.Size = UDim2.new(1, 0, 1, 0)
                 espLabel.Font = Enum.Font.SourceSansBold
-                espLabel.Text = player.Name -- Mostra o nome do jogador
+                espLabel.Text = player.Name .. " (" .. player.Team.Name .. ")" -- Mostra o nome e a equipe do jogador
                 espLabel.TextColor3 = Color3.new(1, 1, 1)
                 espLabel.TextSize = 18
             end
         end
     else -- Se o ESP estiver desativado
-        espButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Muda a cor do botão para cinza
-        for _, player in pairs(game.Players:GetPlayers()) do -- Percorre todos os jogadores do jogo
-            if player ~= game.Players.LocalPlayer then -- Se o jogador não for o usuário
-                player.Character.Head:FindFirstChild("ESP"):Destroy() -- Remove a caixa de ESP
-            end
-        end
+        espButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128) -- Muda a cor do botão para cinza
     end
 end
-
--- Conecta um evento para detectar quando o usuário clica no botão Fly
-flyButton.MouseButton1Click:Connect(toggleFly)
-
--- Conecta um evento para detectar quando o usuário clica no botão ESP
-espButton.MouseButton1Click:Connect(toggleESP)
-
--- Conecta um evento para detectar quando o usuário pressiona a tecla X no teclado
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.X then -- Se a tecla for X
-        toggleFly() -- Chama a função toggleFly
-    end
-end)
