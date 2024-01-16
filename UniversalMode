@@ -1,0 +1,103 @@
+-- Exemplo de botão para alterar a velocidade de caminhada
+local function createWalkSpeedButton(parent)
+  -- Cria um botão com o rótulo "Walk Speed"
+  local button = wx.wxButton(parent, wx.wxID_ANY, "Walk Speed")
+  -- Define a posição e o tamanho do botão
+  button:SetPosition(wx.wxPoint(10, 10))
+  button:SetSize(wx.wxSize(100, 50))
+  -- Define a cor do botão
+  button:SetBackgroundColour(wx.wxColour(255, 255, 0)) -- Amarelo
+  -- Define a ação do botão
+  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+    -- Obtém a velocidade de caminhada atual do jogador
+    local walkSpeed = player:GetWalkSpeed()
+    -- Aumenta a velocidade de caminhada em 10 unidades
+    walkSpeed = walkSpeed + 10
+    -- Define a nova velocidade de caminhada do jogador
+    player:SetWalkSpeed(walkSpeed)
+    -- Mostra uma mensagem na tela com a nova velocidade de caminhada
+    wx.wxMessageBox("Sua velocidade de caminhada agora é " .. walkSpeed, "Walk Speed")
+  end)
+  -- Retorna o botão criado
+  return button
+end
+
+-- Exemplo de botão para ativar o modo de voo
+local function createFlyButton(parent)
+  -- Cria um botão com o rótulo "Fly"
+  local button = wx.wxButton(parent, wx.wxID_ANY, "Fly")
+  -- Define a posição e o tamanho do botão
+  button:SetPosition(wx.wxPoint(120, 10))
+  button:SetSize(wx.wxSize(100, 50))
+  -- Define a cor do botão
+  button:SetBackgroundColour(wx.wxColour(0, 255, 255)) -- Ciano
+  -- Define a ação do botão
+  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+    -- Verifica se o jogador já está no modo de voo
+    if player:IsFlying() then
+      -- Desativa o modo de voo
+      player:StopFlying()
+      -- Mostra uma mensagem na tela
+      wx.wxMessageBox("Você desativou o modo de voo", "Fly")
+    else
+      -- Ativa o modo de voo
+      player:StartFlying()
+      -- Mostra uma mensagem na tela
+      wx.wxMessageBox("Você ativou o modo de voo", "Fly")
+    end
+  end)
+  -- Retorna o botão criado
+  return button
+end
+
+-- Exemplo de botão para alterar a potência de salto
+local function createJumpPowerButton(parent)
+  -- Cria um botão com o rótulo "Jump Power"
+  local button = wx.wxButton(parent, wx.wxID_ANY, "Jump Power")
+  -- Define a posição e o tamanho do botão
+  button:SetPosition(wx.wxPoint(230, 10))
+  button:SetSize(wx.wxSize(100, 50))
+  -- Define a cor do botão
+  button:SetBackgroundColour(wx.wxColour(255, 0, 255)) -- Magenta
+  -- Define a ação do botão
+  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+    -- Obtém a potência de salto atual do jogador
+    local jumpPower = player:GetJumpPower()
+    -- Aumenta a potência de salto em 5 unidades
+    jumpPower = jumpPower + 5
+    -- Define a nova potência de salto do jogador
+    player:SetJumpPower(jumpPower)
+    -- Mostra uma mensagem na tela com a nova potência de salto
+    wx.wxMessageBox("Sua potência de salto agora é " .. jumpPower, "Jump Power")
+  end)
+  -- Retorna o botão criado
+  return button
+end
+
+-- Exemplo de botão para ativar o ESP (Extra Sensory Perception)
+local function createESPButton(parent)
+  -- Cria um botão com o rótulo "ESP"
+  local button = wx.wxButton(parent, wx.wxID_ANY, "ESP")
+  -- Define a posição e o tamanho do botão
+  button:SetPosition(wx.wxPoint(340, 10))
+  button:SetSize(wx.wxSize(100, 50))
+  -- Define a cor do botão
+  button:SetBackgroundColour(wx.wxColour(0, 255, 0)) -- Verde
+  -- Define a ação do botão
+  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
+    -- Verifica se o jogador já está com o ESP ativado
+    if player:HasESP() then
+      -- Desativa o ESP
+      player:DisableESP()
+      -- Mostra uma mensagem na tela
+      wx.wxMessageBox("Você desativou o ESP", "ESP")
+    else
+      -- Ativa o ESP
+      player:EnableESP()
+      -- Mostra uma mensagem na tela
+      wx.wxMessageBox("Você ativou o ESP", "ESP")
+    end
+  end)
+  -- Retorna o botão criado
+  return button
+end
