@@ -1,103 +1,284 @@
--- Exemplo de botão para alterar a velocidade de caminhada
-local function createWalkSpeedButton(parent)
-  -- Cria um botão com o rótulo "Walk Speed"
-  local button = wx.wxButton(parent, wx.wxID_ANY, "Walk Speed")
-  -- Define a posição e o tamanho do botão
-  button:SetPosition(wx.wxPoint(10, 10))
-  button:SetSize(wx.wxSize(100, 50))
-  -- Define a cor do botão
-  button:SetBackgroundColour(wx.wxColour(255, 255, 0)) -- Amarelo
-  -- Define a ação do botão
-  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-    -- Obtém a velocidade de caminhada atual do jogador
-    local walkSpeed = player:GetWalkSpeed()
-    -- Aumenta a velocidade de caminhada em 10 unidades
-    walkSpeed = walkSpeed + 10
-    -- Define a nova velocidade de caminhada do jogador
-    player:SetWalkSpeed(walkSpeed)
-    -- Mostra uma mensagem na tela com a nova velocidade de caminhada
-    wx.wxMessageBox("Sua velocidade de caminhada agora é " .. walkSpeed, "Walk Speed")
-  end)
-  -- Retorna o botão criado
-  return button
-end
+-- Carregando a biblioteca IUP
+local iup = require "iuplua"
 
--- Exemplo de botão para ativar o modo de voo
-local function createFlyButton(parent)
-  -- Cria um botão com o rótulo "Fly"
-  local button = wx.wxButton(parent, wx.wxID_ANY, "Fly")
-  -- Define a posição e o tamanho do botão
-  button:SetPosition(wx.wxPoint(120, 10))
-  button:SetSize(wx.wxSize(100, 50))
-  -- Define a cor do botão
-  button:SetBackgroundColour(wx.wxColour(0, 255, 255)) -- Ciano
-  -- Define a ação do botão
-  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-    -- Verifica se o jogador já está no modo de voo
-    if player:IsFlying() then
-      -- Desativa o modo de voo
-      player:StopFlying()
-      -- Mostra uma mensagem na tela
-      wx.wxMessageBox("Você desativou o modo de voo", "Fly")
-    else
-      -- Ativa o modo de voo
-      player:StartFlying()
-      -- Mostra uma mensagem na tela
-      wx.wxMessageBox("Você ativou o modo de voo", "Fly")
+-- Criando uma função para cada botão
+local function funcao_botao1()
+-- Criando uma variável para armazenar a nova velocidade de caminhada
+local nova_velocidade = 20 -- você pode mudar esse valor
+
+-- Criando uma função para alterar a velocidade de caminhada do jogador
+local function alterarVelocidade(jogador)
+    -- Pegando o personagem do jogador
+    local personagem = jogador.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando o objeto Humanoid do personagem
+        local humanoide = personagem:FindFirstChildWhichIsA("Humanoid")
+        -- Verificando se o humanoide existe
+        if humanoide then
+            -- Alterando a propriedade WalkSpeed do humanoide
+            humanoide.WalkSpeed = nova_velocidade
+        end
     end
-  end)
-  -- Retorna o botão criado
-  return button
 end
 
--- Exemplo de botão para alterar a potência de salto
-local function createJumpPowerButton(parent)
-  -- Cria um botão com o rótulo "Jump Power"
-  local button = wx.wxButton(parent, wx.wxID_ANY, "Jump Power")
-  -- Define a posição e o tamanho do botão
-  button:SetPosition(wx.wxPoint(230, 10))
-  button:SetSize(wx.wxSize(100, 50))
-  -- Define a cor do botão
-  button:SetBackgroundColour(wx.wxColour(255, 0, 255)) -- Magenta
-  -- Define a ação do botão
-  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-    -- Obtém a potência de salto atual do jogador
-    local jumpPower = player:GetJumpPower()
-    -- Aumenta a potência de salto em 5 unidades
-    jumpPower = jumpPower + 5
-    -- Define a nova potência de salto do jogador
-    player:SetJumpPower(jumpPower)
-    -- Mostra uma mensagem na tela com a nova potência de salto
-    wx.wxMessageBox("Sua potência de salto agora é " .. jumpPower, "Jump Power")
-  end)
-  -- Retorna o botão criado
-  return button
-end
+-- Criando um evento para quando o jogador entrar no jogo
+game.Players.PlayerAdded:Connect(function(jogador)
+    -- Chamando a função de alterar a velocidade
+    alterarVelocidade(jogador)
+end)
 
--- Exemplo de botão para ativar o ESP (Extra Sensory Perception)
-local function createESPButton(parent)
-  -- Cria um botão com o rótulo "ESP"
-  local button = wx.wxButton(parent, wx.wxID_ANY, "ESP")
-  -- Define a posição e o tamanho do botão
-  button:SetPosition(wx.wxPoint(340, 10))
-  button:SetSize(wx.wxSize(100, 50))
-  -- Define a cor do botão
-  button:SetBackgroundColour(wx.wxColour(0, 255, 0)) -- Verde
-  -- Define a ação do botão
-  button:Connect(wx.wxEVT_COMMAND_BUTTON_CLICKED, function(event)
-    -- Verifica se o jogador já está com o ESP ativado
-    if player:HasESP() then
-      -- Desativa o ESP
-      player:DisableESP()
-      -- Mostra uma mensagem na tela
-      wx.wxMessageBox("Você desativou o ESP", "ESP")
-    else
-      -- Ativa o ESP
-      player:EnableESP()
-      -- Mostra uma mensagem na tela
-      wx.wxMessageBox("Você ativou o ESP", "ESP")
+local function funcao_botao2()
+  -- Criando uma parte para representar o hitbox de um inimigo
+local hitbox = Instance.new("Part")
+hitbox.Name = "Hitbox"
+hitbox.Size = Vector3.new(5, 5, 5)
+hitbox.Position = Vector3.new(0, 5, 0)
+hitbox.Anchored = true
+hitbox.CanCollide = false
+hitbox.Transparency = 0.5
+hitbox.Parent = workspace
+
+-- Criando uma função para verificar se o personagem do jogador está tocando o hitbox
+local function checarHitbox(jogador)
+    -- Pegando o personagem do jogador
+    local personagem = jogador.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando todas as partes que estão tocando o hitbox
+        local partes = hitbox:GetTouchingParts()
+        -- Percorrendo cada parte
+        for _, parte in pairs(partes) do
+            -- Verificando se a parte pertence ao personagem
+            if parte:IsDescendantOf(personagem) then
+                -- Retornando verdadeiro se sim
+                return true
+            end
+        end
     end
-  end)
-  -- Retorna o botão criado
-  return button
+    -- Retornando falso se não
+    return false
 end
+
+-- Criando um evento para quando o jogador entrar no jogo
+game.Players.PlayerAdded:Connect(function(jogador)
+    -- Criando um loop para verificar o hitbox a cada 0.1 segundos
+    while wait(0.1) do
+        -- Chamando a função de checar o hitbox
+        local resultado = checarHitbox(jogador)
+        -- Verificando se o resultado é verdadeiro
+        if resultado then
+            -- Fazendo alguma ação, como tirar vida do jogador
+            print("O jogador " .. jogador.Name .. " foi atingido pelo hitbox!")
+        end
+    end
+end)
+
+local function funcao_botao3()
+  -- Criando uma variável para armazenar a velocidade de voo
+local velocidade = 50
+
+-- Criando uma função para fazer o personagem voar
+local function voar(jogador)
+    -- Pegando o personagem do jogador
+    local personagem = jogador.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando a parte que representa o torso do personagem
+        local torso = personagem:FindFirstChild("Torso")
+        -- Verificando se o torso existe
+        if torso then
+            -- Criando um objeto BodyVelocity para alterar a velocidade do torso
+            local bv = Instance.new("BodyVelocity")
+            bv.Name = "Voar"
+            bv.Parent = torso
+            bv.maxForce = Vector3.new(0, 0, 0) -- Desativando a força máxima
+            bv.velocity = Vector3.new(0, velocidade, 0) -- Definindo a velocidade vertical
+        end
+    end
+end
+
+-- Criando uma função para fazer o personagem parar de voar
+local function parar(jogador)
+    -- Pegando o personagem do jogador
+    local personagem = jogador.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando a parte que representa o torso do personagem
+        local torso = personagem:FindFirstChild("Torso")
+        -- Verificando se o torso existe
+        if torso then
+            -- Removendo o objeto BodyVelocity do torso
+            local bv = torso:FindFirstChild("Voar")
+            if bv then
+                bv:Destroy()
+            end
+        end
+    end
+end
+
+-- Criando um evento para quando o jogador entrar no jogo
+game.Players.PlayerAdded:Connect(function(jogador)
+    -- Criando um evento para quando o jogador apertar a tecla F
+    jogador:GetMouse().KeyDown:Connect(function(tecla)
+        if tecla == "f" then
+            -- Chamando a função de voar
+            voar(jogador)
+        end
+    end)
+    -- Criando um evento para quando o jogador soltar a tecla F
+    jogador:GetMouse().KeyUp:Connect(function(tecla)
+        if tecla == "f" then
+            -- Chamando a função de parar
+            parar(jogador)
+        end
+    end)
+end)
+
+
+local function funcao_botao4()
+  --- Criando uma variável para armazenar a distância máxima do raio
+local distancia = 1000
+
+-- Criando uma função para mostrar o inimigo na tela
+local function mostrarInimigo(inimigo)
+    -- Pegando o personagem do inimigo
+    local personagem = inimigo.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando a parte que representa a cabeça do personagem
+        local cabeca = personagem:FindFirstChild("Head")
+        -- Verificando se a cabeça existe
+        if cabeca then
+            -- Criando um objeto BillboardGui para mostrar o nome do inimigo
+            local gui = Instance.new("BillboardGui")
+            gui.Name = "ESP"
+            gui.Parent = cabeca
+            gui.Size = UDim2.new(0, 100, 0, 50) -- Definindo o tamanho do gui
+            gui.StudsOffset = Vector3.new(0, 2, 0) -- Definindo o deslocamento do gui
+            gui.AlwaysOnTop = true -- Definindo que o gui deve ficar sempre no topo
+            -- Criando um objeto TextLabel para mostrar o nome do inimigo
+            local label = Instance.new("TextLabel")
+            label.Parent = gui
+            label.Size = UDim2.new(1, 0, 1, 0) -- Definindo o tamanho do label
+            label.BackgroundTransparency = 1 -- Definindo a transparência do fundo
+            label.Text = inimigo.Name -- Definindo o texto do label
+            label.TextColor3 = Color3.new(1, 0, 0) -- Definindo a cor do texto
+            label.TextScaled = true -- Definindo que o texto deve ser escalado
+        end
+    end
+end
+
+-- Criando uma função para esconder o inimigo da tela
+local function esconderInimigo(inimigo)
+    -- Pegando o personagem do inimigo
+    local personagem = inimigo.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando a parte que representa a cabeça do personagem
+        local cabeca = personagem:FindFirstChild("Head")
+        -- Verificando se a cabeça existe
+        if cabeca then
+            -- Removendo o objeto BillboardGui da cabeça
+            local gui = cabeca:FindFirstChild("ESP")
+            if gui then
+                gui:Destroy()
+            end
+        end
+    end
+end
+
+-- Criando uma função para verificar se o inimigo está visível
+local function checarInimigo(jogador, inimigo)
+    -- Pegando o personagem do jogador
+    local personagem = jogador.Character
+    -- Verificando se o personagem existe
+    if personagem then
+        -- Pegando a parte que representa a cabeça do personagem
+        local cabeca = personagem:FindFirstChild("Head")
+        -- Verificando se a cabeça existe
+        if cabeca then
+            -- Pegando a posição da cabeça
+            local posicao = cabeca.Position
+            -- Pegando a direção do olhar da cabeça
+            local direcao = cabeca.CFrame.LookVector
+            -- Criando um objeto Ray a partir da posição e da direção
+            local raio = Ray.new(posicao, direcao * distancia)
+            -- Traçando o raio e pegando a primeira parte que ele atingir
+            local parte, ponto = workspace:FindPartOnRay(raio, personagem)
+            -- Verificando se a parte existe
+            if parte then
+                -- Verificando se a parte pertence ao inimigo
+                if parte:IsDescendantOf(inimigo.Character) then
+                    -- Mostrando o inimigo na tela
+                    mostrarInimigo(inimigo)
+                else
+                    -- Escondendo o inimigo da tela
+                    esconderInimigo(inimigo)
+                end
+            else
+                -- Escondendo o inimigo da tela
+                esconderInimigo(inimigo)
+            end
+        end
+    end
+end
+
+-- Criando um evento para quando o jogador entrar no jogo
+game.Players.PlayerAdded:Connect(function(jogador)
+    -- Criando um loop para verificar os inimigos a cada 0.1 segundos
+    while wait(0.1) do
+        -- Pegando todos os jogadores do jogo
+        local jogadores = game.Players:GetPlayers()
+        -- Percorrendo cada jogador
+        for _, inimigo in pairs(jogadores) do
+            -- Verificando se o jogador é diferente do inimigo
+            if jogador ~= inimigo then
+                -- Chamando a função de checar o inimigo
+                checarInimigo(jogador, inimigo)
+            end
+        end
+    end
+end)
+
+
+-- Criando os botões com os nomes e as funções
+local botao1 = iup.button{title = "WalkSpeed", action = funcao_botao1}
+local botao2 = iup.button{title = "Hitbox", action = funcao_botao2}
+local botao3 = iup.button{title = "Fly", action = funcao_botao3}
+local botao4 = iup.button{title = "Esp", action = funcao_botao4}
+
+-- Criando um box horizontal para os botões
+local hbox = iup.hbox{botao1, botao2, botao3, botao4}
+
+-- Criando um label para o título
+local label_titulo = iup.label{title = "Lua  Hub • Universal Mode", font = "Arial, 16"}
+
+-- Criando um box vertical para o título e os botões
+local vbox = iup.vbox{label_titulo, hbox}
+
+-- Criando uma janela para o hub
+local janela = iup.dialog{vbox; title = "Lua Hub • Universal Mode", size = "300x200", bgcolor = "0 0 0"}
+
+-- Definindo as cores dos botões e do título
+botao1.fgcolor = "255 255 255" -- branco
+botao2.fgcolor = "255 255 255" -- branco
+botao3.fgcolor = "255 255 255" -- branco
+botao4.fgcolor = "255 255 255" -- branco
+botao1.bgcolor = "128 128 128" -- cinza
+botao2.bgcolor = "128 128 128" -- cinza
+botao3.bgcolor = "128 128 128" -- cinza
+botao4.bgcolor = "128 128 128" -- cinza
+label_titulo.fgcolor = "255 255 255" -- branco
+
+-- Definindo as bordas arredondadas dos botões
+botao1.flat = "NO"
+botao2.flat = "NO"
+botao3.flat = "NO"
+botao4.flat = "NO"
+
+-- Mostrando a janela
+janela:showxy(iup.CENTER, iup.CENTER)
+
+-- Iniciando o loop de eventos
+iup.MainLoop()
