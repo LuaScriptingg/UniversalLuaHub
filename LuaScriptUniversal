@@ -1,0 +1,184 @@
+-- Cria uma tela GUI para o hub
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Lua Hub • Universal Mode"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Cria um frame para o fundo do hub
+local frame = Instance.new("Frame")
+frame.Name = "Background"
+frame.BackgroundColor3 = Color3.new(0, 0, 0) -- Cor preta
+frame.Size = UDim2.new(0.3, 0, 0.5, 0) -- Tamanho relativo à tela
+frame.Position = UDim2.new(0.35, 0, 0.25, 0) -- Posição relativa à tela
+frame.Parent = screenGui
+
+-- Cria um texto para o título do hub
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Text = "Lua Hub • Universal Mode" -- Texto do título
+title.TextColor3 = Color3.new(1, 1, 1) -- Cor branca
+title.Font = Enum.Font.SourceSansBold -- Fonte em negrito
+title.TextSize = 24 -- Tamanho do texto
+title.Size = UDim2.new(1, 0, 0.1, 0) -- Tamanho relativo ao frame
+title.Position = UDim2.new(0, 0, 0, 0) -- Posição relativa ao frame
+title.Parent = frame
+
+-- Cria uma função para criar botões
+local function createButton(name, text, position, script)
+    local button = Instance.new("TextButton") -- Cria um botão de texto
+    button.Name = name -- Nome do botão
+    button.Text = text -- Texto do botão
+    button.TextColor3 = Color3.new(0.5, 0.5, 0.5) -- Cor cinza
+    button.Font = Enum.Font.SourceSans -- Fonte normal
+    button.TextSize = 18 -- Tamanho do texto
+    button.Size = UDim2.new(0.8, 0, 0.15, 0) -- Tamanho relativo ao frame
+    button.Position = UDim2.new(0.1, 0, position, 0) -- Posição relativa ao frame
+    button.Parent = frame -- Define o frame como o pai do botão
+    button.MouseButton1Click:Connect(script) -- Conecta o script ao evento de clique do botão
+    return button -- Retorna o botão criado
+end
+
+-- Cria um botão para hitbox
+local hitboxButton = createButton(
+    "Hitbox", -- Nome do botão
+    "Hitbox", -- Texto do botão
+    0.15, -- Posição vertical do botão
+    function() -- Script do botão
+        -- Altera o tamanho da hitbox do jogador
+        local player = game.Players.LocalPlayer -- Pega o jogador local
+        local character = player.Character or player.CharacterAdded:Wait() -- Pega o personagem do jogador
+        local humanoid = character:WaitForChild("Humanoid") -- Pega o humanoide do personagem
+        local hitboxScale = 2 -- Define o fator de escala da hitbox
+        humanoid.HipHeight = humanoid.HipHeight * hitboxScale -- Aumenta a altura do quadril
+        humanoid.BodyDepthScale.Value = hitboxScale -- Aumenta a profundidade do corpo
+        humanoid.BodyHeightScale.Value = hitboxScale -- Aumenta a altura do corpo
+        humanoid.BodyWidthScale.Value = hitboxScale -- Aumenta a largura do corpo
+    end
+)
+
+-- Cria um botão para fly
+local flyButton = createButton(
+    "Fly", -- Nome do botão
+    "Fly", -- Texto do botão
+    0.35, -- Posição vertical do botão
+    function() -- Script do botão
+        -- Permite ao jogador voar pelo mapa
+        local player = game.Players.LocalPlayer -- Pega o jogador local
+        local mouse = player:GetMouse() -- Pega o mouse do jogador
+        local character = player.Character or player.CharacterAdded:Wait() -- Pega o personagem do jogador
+        local humanoid = character:WaitForChild("Humanoid") -- Pega o humanoide do personagem
+        local torso = character:WaitForChild("Torso") -- Pega o torso do personagem
+        local flying = false -- Define uma variável para indicar se o jogador está voando
+        local speed = 50 -- Define a velocidade de voo
+        local bodyVelocity = Instance.new("BodyVelocity") -- Cria um objeto de velocidade do corpo
+        bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge) -- Define a força máxima do objeto
+        bodyVelocity.Velocity = Vector3.new(0, 0.1, 0) -- Define a velocidade inicial do objeto
+        bodyVelocity.Parent = torso -- Define o torso como o pai do objeto
+
+        -- Cria uma função para ativar ou desativar o voo
+        local function toggleFly()
+            flying = not flying -- Inverte o valor da variável de voo
+            if flying then -- Se o jogador está voando
+                humanoid.PlatformStand = true -- Ativa o modo de plataforma
+                bodyVelocity.Velocity = Vector3.new(0, 0.1, 0) -- Define a velocidade inicial do objeto
+            else -- Se o jogador não está voando
+                humanoid.PlatformStand = false -- Desativa o modo de plataforma
+                bodyVelocity.Velocity = Vector3.new(0, 0, 0) -- Define a velocidade do objeto como zero
+            end
+        end
+
+        -- Cria uma função para atualizar a velocidade do objeto de acordo com o mouse
+        local function updateFly()
+            if flying then -- Se o jogador está voando
+                bodyVelocity.Velocity = (mouse.Hit.p - torso.Position).unit * speed -- Define a velocidade do objeto como a direção do mouse multiplicada pela velocidade
+            end
+        end
+
+        -- Conecta a tecla E ao evento de ativar ou desativar o voo
+        mouse.KeyDown:Connect(function(key)
+            if key == "e" then -- Se a tecla pressionada é E
+                toggleFly() -- Chama a função de ativar ou desativar o voo
+            end
+        end)
+
+        -- Conecta o evento de movimento do mouse ao evento de atualizar o voo
+        mouse.Move:Connect(updateFly)
+    end
+)
+
+-- Cria um botão para esp
+local espButton = createButton(
+    "Esp", -- Nome do botão
+    "Esp", -- Texto do botão
+    0.55, -- Posição vertical do botão
+    function() -- Script do botão
+        -- Mostra a posição dos outros jogadores no mapa
+        local player = game.Players.LocalPlayer -- Pega o jogador local
+        local camera = workspace.CurrentCamera -- Pega a câmera atual
+        local espEnabled = false -- Define uma variável para indicar se o esp está ativado
+        local espColor = Color3.new(1, 0, 0) -- Define a cor do esp
+        local espTransparency = 0.5 -- Define a transparência do esp
+        local espThickness = 2 -- Define a espessura do esp
+        local espLabels = {} -- Define uma tabela para armazenar os labels do esp
+
+        -- Cria uma função para ativar ou desativar o esp
+        local function toggleEsp()
+            espEnabled = not espEnabled -- Inverte o valor da variável de esp
+            if espEnabled then -- Se o esp está ativado
+                for _, otherPlayer in pairs(game.Players:GetPlayers()) do -- Para cada outro jogador no jogo
+                    if otherPlayer ~= player then -- Se o outro jogador não é o jogador local
+                        local otherCharacter = otherPlayer.Character -- Pega o personagem do outro jogador
+                        if otherCharacter then -- Se o personagem existe
+                            local otherHead = otherCharacter:FindFirstChild("Head") -- Pega a cabeça do personagem
+                            if otherHead then -- Se a cabeça existe
+                                local espLabel = Instance.new("BillboardGui") -- Cria um label de billboard
+                                espLabel.Name = "EspLabel" -- Nomeia o label
+                                                                espLabel.Adornee = otherHead -- Define a cabeça como o objeto que o label segue
+                                espLabel.AlwaysOnTop = true -- Mantém o label sempre visível
+                                espLabel.Size = UDim2.new(0, 100, 0, 50) -- Define o tamanho do label
+                                espLabel.StudsOffset = Vector3.new(0, 1, 0) -- Define o deslocamento do label
+                                espLabel.Parent = otherHead -- Define o label como filho da cabeça
+                                local espText = Instance.new("TextLabel") -- Cria um texto para o label
+                                espText.Name = "EspText" -- Nomeia o texto
+                                espText.Text = otherPlayer.Name -- Define o texto como o nome do outro jogador
+                                espText.TextColor3 = espColor -- Define a cor do texto
+                                espText.BackgroundTransparency = espTransparency -- Define a transparência do fundo
+                                espText.BorderSizePixel = espThickness -- Define a espessura da borda
+                                espText.BorderColor3 = espColor -- Define a cor da borda
+                                espText.Size = UDim2.new(1, 0, 1, 0) -- Define o tamanho do texto
+                                espText.Position = UDim2.new(0, 0, 0, 0) -- Define a posição do texto
+                                espText.Parent = espLabel -- Define o texto como filho do label
+                                espLabels[otherPlayer] = espLabel -- Adiciona o label à tabela de labels
+                            end
+                        end
+                    end
+                end
+            else -- Se o esp está desativado
+                for _, espLabel in pairs(espLabels) do -- Para cada label na tabela de labels
+                    espLabel:Destroy() -- Destrói o label
+                end
+                espLabels = {} -- Limpa a tabela de labels
+            end
+        end
+
+        -- Conecta a tecla R ao evento de ativar ou desativar o esp
+        player:GetMouse().KeyDown:Connect(function(key)
+            if key == "r" then -- Se a tecla pressionada é R
+                toggleEsp() -- Chama a função de ativar ou desativar o esp
+            end
+        end)
+    end
+)
+
+-- Cria um botão para walk speed
+local walkSpeedButton = createButton(
+    "Walk Speed", -- Nome do botão
+    "Walk Speed", -- Texto do botão
+    0.75, -- Posição vertical do botão
+    function() -- Script do botão
+        -- Altera a velocidade de caminhada do jogador
+        local player = game.Players.LocalPlayer -- Pega o jogador local
+        local character = player.Character or player.CharacterAdded:Wait() -- Pega o personagem do jogador
+        local humanoid = character:WaitForChild("Humanoid") -- Pega o humanoide do personagem
+        local walkSpeed = 100 -- Define a velocidade de caminhada
+        humanoid.WalkSpeed = walkSpeed -- Define a velocidade de caminhada do humanoide
+    end
